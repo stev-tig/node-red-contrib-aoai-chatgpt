@@ -1,0 +1,73 @@
+<script type="text/javascript">
+  RED.nodes.registerType('aoai-chatgpt-config', {
+    category: 'config',
+    defaults: {
+      name: { value: "Your Model Name", required: true },
+      deploymentId: { value: "Model Deployment ID", required: true },
+    },
+    credentials: {
+      endpoint: { value: "", required: true },
+      apikey: { value: "", required: true },
+    },
+    label: function () {
+      return this.name;
+    }
+  });
+</script>
+
+<script type="text/html" data-template-name="aoai-chatgpt-config">
+  <div class="form-tips">
+      <h2>Azure OpenAI ChatGPT</h2>
+      <p>Create an Azure Account, apply for access to Azure OpenAI Service to get an API key</p>
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+      <input type="text" id="node-config-input-name">
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-deploymentId"><i class="fa fa-tag"></i> MODEL-DEPLOYMENT-ID</label>
+    <input type="text" id="node-config-input-deploymentId">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-endpoint"><i class="fa fa-tag"></i> ENDPOINT</label>
+      <input type="text" id="node-config-input-endpoint">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-apikey"><i class="fa fa-tag"></i> API-KEY</label>
+      <input type="text" id="node-config-input-apikey">
+  </div>
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('aoai-chatgpt',{
+      category: 'function',
+      color: '#a6bbcf',
+      defaults: {
+          config: {value: "", type: "aoai-chatgpt-config"},
+          name: {value:""},
+          maxTokens: {value:128, required: true, validate:RED.validators.number()}
+      },
+      inputs:1,
+      outputs:1,
+      label: function() {
+          return this.name||"aoai-chatgpt";
+      }
+  });
+</script>
+
+<script type="text/html" data-template-name="aoai-chatgpt">
+  <div class="form-row">
+      <label for="node-input-config" style="white-space: nowrap; width: 125px">
+          <i class="icon-tag"></i> Azure OpenAI account
+      </label>
+      <input type="text" id="node-input-config" placeholder="Select AOAI account">
+  </div>
+  <div class="form-row">
+      <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+      <label for="node-input-maxTokens"><i class="icon-tag"></i> maxTokens</label>
+      <input type="number" id="node-input-maxTokens">
+  </div>
+</script>
