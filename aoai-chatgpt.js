@@ -1,5 +1,3 @@
-const { initialize } = require("./src/openai-api.mjs");
-
 module.exports = function (RED) {
   function AOAIChatGPTConfigNode(n) {
     RED.nodes.createNode(this, n);
@@ -15,45 +13,49 @@ module.exports = function (RED) {
   });
 
   function AOAIChatGPTNode(config) {
-        
-    RED.nodes.createNode(this, config);
 
-    const aoaiconfig = RED.nodes.getNode(config.config);
-    const deploymentId = aoaiconfig.deploymentId;
+    const nthis = this;
+    import("./src/openai-api.mjs").then((openai) => {
+      RED.nodes.createNode(this, config);
+      this.name = config.name;
 
-    if (!this.config) {
-      this.status({fill: "red", shape: "ring", text: "missing config"});
-      return;
-    }
-
-    this.status({fill: "green", shape: "ring", text: "Ready"});
-
-    const client = initialize(aoaiconfig.credentials.endpoint, aoaiconfig.credentials.apikey)
-
-    this.on('input', function(msg) {
-
-      const systemPrompt = msg.payload.systemPrompt;
-      const historicalPrompts = msg.payload.historicalPrompts;
-      const inputPrompt = msg.payload.inputPrompt;
-      const maxTokens = msg.payload.maxTokens ?? config.maxTokens;
-
-      this.status({fill: "blue", shape: "ring", text: "Busy"});
-
-      try {
-        const response = chat(client, deploymentId, systemPrompt, historicalPrompts, inputPrompt, maxTokens);
-        msg.payload = response;
-        this.send(msg);
-        this.status({fill: "green", shape: "ring", text: "Ready"});
-
-      } catch (err) {
-        console.error("encountered an error:", err);
-        this.status({fill: "red", shape: "ring", text: "Error"});
+      const aoaiconfig = RED.nodes.getNode(config.config);
+  
+      if (!aoaiconfig) {
+        nthis.status({fill: "red", shape: "ring", text: "missing config"});
+        return;
       }
+  
+      const deploymentId = aoaiconfig.deploymentId;
+      nthis.status({fill: "green", shape: "ring", text: "Ready"});
+  
+      const client = openai.initialize(aoaiconfig.credentials.endpoint, aoaiconfig.credentials.apikey)
+  
+      nthis.on('input', async function(msg) {
+  
+        const systemPrompt = msg.payload.systemPrompt;
+        const historicalPrompts = msg.payload.historicalPrompts;
+        const inputPrompt = msg.payload.inputPrompt;
+        const maxTokens = msg.payload.maxTokens ?? config.maxTokens;
+  
+        nthis.status({fill: "blue", shape: "ring", text: "Busy"});
+  
+        try {
+          const response = await openai.chat(client, deploymentId, systemPrompt, historicalPrompts, inputPrompt, maxTokens);
+          msg.payload.response = response;
+          nthis.send(msg);
+          nthis.status({fill: "green", shape: "ring", text: "Ready"});
+  
+        } catch (err) {
+          console.error("encountered an error:", err);
+          nthis.status({fill: "red", shape: "ring", text: "Error"});
+        }
+      });
+  
+      nthis.on('close', function() {
+      });
+  
     });
-
-    this.on('close', function() {
-    });
-
   }
 
   RED.nodes.registerType("aoai-chatgpt",AOAIChatGPTNode);
