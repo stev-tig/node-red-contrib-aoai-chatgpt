@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-aoai-chatgpt",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "node uses Azure OpenAI",
   "node-red": {
     "nodes": {
@@ -10,6 +10,19 @@
   "scripts": {
     "test": "node src/test.mjs"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stev-tig/node-red-contrib-aoai-chatgpt"
+  },
+  "keywords": [
+    "Azure OpenAI",
+    "aoai",
+    "OpenAI",
+    "openai",
+    "Node Red",
+    "node-red",
+    "nodered"
+  ],
   "author": "Steven Poon",
   "license": "MIT",
   "dependencies": {
