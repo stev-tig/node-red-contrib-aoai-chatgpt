@@ -19,11 +19,17 @@ export function initialize(endpoint, apikey) {
  * systemPrompt: string
  * messages: { role: string, content: string }[]
  * input: string
+ * inputName: string?
  * returns: string
  */
-export async function chat(client, deploymentId, systemPrompt, messages, input, maxTokens) {
+export async function chat(client, deploymentId, systemPrompt, messages, input, inputName, maxTokens) {
   let response = "";
-  messages.push({ role: "user", content: input });
+
+  let currMessage = { role: "user", content: input };
+  if (inputName) {
+    currMessage.name = inputName;
+  }
+  messages.push(currMessage);
 
   const chatCompletions = await client.getChatCompletions(
     deploymentId,

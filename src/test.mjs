@@ -1,6 +1,18 @@
 import 'dotenv/config';
-import { waitForInput } from "./helper.mjs";
+import readline from 'readline';
 import { initialize } from "./openai-api.mjs";
+
+export function waitForInput(query) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise(resolve => rl.question(query, ans => {
+    rl.close();
+    resolve(ans);
+  }))
+}
 
 async function main() {
   const client = initialize(process.env.AOAI_ENDPOINT, process.env.AOAI_API_KEY);
@@ -15,7 +27,7 @@ async function main() {
 
   while (true) {
     const input = await waitForInput("You > ");
-    const response = await chat(client, deploymentId, systemPrompts, messages, input, 128);
+    const response = await chat(client, deploymentId, systemPrompts, messages, input, "User A", 128);
     console.log(`assistant: ${response}`);
   }
 }

@@ -1,3 +1,4 @@
+<!-- config node -->
 <script type="text/javascript">
   RED.nodes.registerType('aoai-chatgpt-config', {
     category: 'config',
@@ -16,10 +17,6 @@
 </script>
 
 <script type="text/html" data-template-name="aoai-chatgpt-config">
-  <div class="form-tips" style="margin: 20px;">
-    <h3>Azure OpenAI ChatGPT</h3>
-    <p>Create an Azure Account, apply for access to Azure OpenAI Service to get an API key</p>
-  </div>
   <div class="form-row">
     <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-config-input-name">
@@ -38,9 +35,29 @@
   </div>
 </script>
 
+<script type="text/html" data-help-name="aoai-chatgpt-config">
+  <p>Configuring credentials</p>
+
+  <h3>Config</h3>
+  <dl class="message-properties">
+    <dt>DEPLOYMENT-ID <span class="property-type">string</span></dt>
+    <dd> Model Deployment ID, if you don't have one, go to Azure OpenAI Studio > Deployments > Create New Deployment</dd>
+    <dt>ENDPOINT <span class="property-type">string</span></dt>
+    <dd> Endpoint of the AI, it is usually <code>https://your-ai-instance.openai.azure.com/</code></dd>
+    <dt>API-KEY <span class="property-type">string</span></dt>
+    <dd> API Key of your AI model</dd>  
+  </dl>
+
+  <h3>References</h3>
+  <ul>
+    <li><a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/">Azure OpenAI Docs</a> - full description of the openai flows</li>
+  </ul>
+</script>
+
+<!-- node -->
 <script type="text/javascript">
   RED.nodes.registerType('aoai-chatgpt', {
-    category: 'function',
+    category: 'openai',
     defaults: {
       config: { value: "", type: "aoai-chatgpt-config" },
       name: { value: "" },
@@ -48,6 +65,8 @@
     },
     inputs: 1,
     outputs: 1,
+    color: "#3FADB5",
+    icon: "font-awesome/fa-spinner",
     label: function () {
       return this.name || "aoai-chatgpt";
     }
@@ -82,7 +101,26 @@
     <dd> input prompt, usually to be the current user input.</dd>
     <dt class="optional">payload.historicalPrompts <span class="property-type">{ role: string, content: string }[]</span></dt>
     <dd> the historical conversion as context.</dd>
+    <dt class="optional">payload.user <span class="property-type">string</span></dt>
+    <dd> optional name of the user</dd>
     <dt class="optional">payload.maxTokens <span class="property-type">number</span></dt>
     <dd> override the configured maxTokens</dd>
   </dl>
+
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload.response <span class="property-type">string</span></dt>
+    <dd> gpt response</dd>
+  </dl>
+
+  <h3>Details</h3>
+  <p><code>msg.payload</code> is used as the payload of the published message.
+  The inputPrompt and gpt response will be appended to the <code>payload.historicalPrompts</code> array.
+  </p>
+
+  <h3>References</h3>
+  <ul>
+    <li><a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/">Azure OpenAI Docs</a> - full description of the openai flows</li>
+  </ul>
+
 </script>
