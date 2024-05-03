@@ -115,7 +115,9 @@
 
   <h3>Details</h3>
   <p><code>msg.payload</code> is used as the payload of the published message.
-  The inputPrompt and gpt response will be appended to the <code>payload.historicalPrompts</code> array.
+  The inputPrompt will be appended to the <code>payload.historicalPrompts</code> array.
+  but gpt response will NOT be appended to the <code>payload.historicalPrompts</code> array.
+  you have to add a manual function node to determine if you want to append the response.
   </p>
 
   <h3>References</h3>

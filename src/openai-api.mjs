@@ -43,6 +43,5 @@ export async function chat(client, deploymentId, systemPrompt, messages, input, 
       response += content;
     }
   }
-  messages.push({ role: "assistant", content: response });
   return response;
 }

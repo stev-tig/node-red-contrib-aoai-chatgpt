@@ -7,8 +7,12 @@ Create the openai instance in Azure, then create a model, then with an API Key y
 ## Supported models
 
 currently only supports models with getChatCompletions
-
 (so gpt-35-turbo-instruct isn't supported yet)
+
+### Tested on
+
+- gpt-35-turbo
+- gpt-4
 
 ## TODO
 
