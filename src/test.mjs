@@ -27,7 +27,16 @@ async function main() {
 
   while (true) {
     const input = await waitForInput("You > ");
-    const response = await chat(client, deploymentId, systemPrompts, messages, input, "User A", 128);
+    const response = await chat(client, deploymentId, systemPrompts, messages, 
+      input, "User A", 
+      {
+        maxTokens: 1024,
+        temperature: 0.7,
+        topP: 1.0,
+        frequencyPenalty: 0.0,
+        presencePenalty: 0.0,
+        // stop: ["\n"]
+      });
     console.log(`assistant: ${response}`);
   }
 }

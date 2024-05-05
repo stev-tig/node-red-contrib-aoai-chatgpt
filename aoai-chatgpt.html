@@ -61,7 +61,11 @@
     defaults: {
       config: { value: "", type: "aoai-chatgpt-config" },
       name: { value: "" },
-      maxTokens: { value: 128, required: true, validate: RED.validators.number() }
+      maxTokens: { value: 128, required: true, validate: RED.validators.number() },
+      temperature: { value: 0.7, required: true, validate: RED.validators.number() },
+      topP: { value: 0.95, required: true, validate: RED.validators.number() },
+      presencePenalty: { value: 0, required: true, validate: RED.validators.number() },
+      frequencyPenalty: { value: 0, required: true, validate: RED.validators.number() },
     },
     inputs: 1,
     outputs: 1,
@@ -88,6 +92,22 @@
     <label for="node-input-maxTokens"><i class="icon-tag"></i> maxTokens</label>
     <input type="number" id="node-input-maxTokens">
   </div>
+  <div class="form-row">
+    <label for="node-input-temperature"><i class="icon-tag"></i> temperature</label>
+    <input type="float" id="node-input-temperature">
+  </div>
+  <div class="form-row">
+    <label for="node-input-topP"><i class="icon-tag"></i> topP</label>
+    <input type="float" id="node-input-topP">
+  </div>
+  <div class="form-row">
+    <label for="node-input-presencePenalty"><i class="icon-tag"></i> presencePenalty</label>
+    <input type="number" id="node-input-presencePenalty">
+  </div>
+  <div class="form-row">
+    <label for="node-input-frequencyPenalty"><i class="icon-tag"></i> frequencyPenalty</label>
+    <input type="number" id="node-input-frequencyPenalty">
+  </div>
 </script>
 
 <script type="text/html" data-help-name="aoai-chatgpt">
@@ -105,6 +125,14 @@
     <dd> optional name of the user</dd>
     <dt class="optional">payload.maxTokens <span class="property-type">number</span></dt>
     <dd> override the configured maxTokens</dd>
+    <dt class="optional">payload.temperature <span class="property-type">float</span></dt>
+    <dd> override the configured temperature, between 0 and 1</dd>
+    <dt class="optional">payload.topP <span class="property-type">float</span></dt>
+    <dd> override the configured topP, between 0 and 1</dd>
+    <dt class="optional">payload.presencePenalty <span class="property-type">number</span></dt>
+    <dd> override the configured presencePenalty</dd>
+    <dt class="optional">payload.frequencyPenalty <span class="property-type">number</span></dt>
+    <dd> override the configured frequencyPenalty</dd>
   </dl>
 
   <h3>Outputs</h3>

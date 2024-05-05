@@ -46,12 +46,26 @@ module.exports = function (RED) {
       const historicalPrompts = msg.payload.historicalPrompts ?? [];
       const inputPrompt = msg.payload.inputPrompt;
       const user = msg.payload.user ?? null;
-      const maxTokens = msg.payload.maxTokens ?? config.maxTokens;
+      const maxTokens = msg.payload.maxTokens ?? parseInt(config.maxTokens);
+      const temperature = msg.payload.temperature ?? parseFloat(config.temperature);
+      const topP = msg.payload.topP ?? parseFloat(config.topP);
+      const frequencyPenalty = msg.payload.frequencyPenalty ?? parseInt(config.frequencyPenalty);
+      const presencePenalty = msg.payload.presencePenalty ?? parseInt(config.presencePenalty);
+      // const stop = msg.payload.stop ?? config.stop;
 
       nthis.status({ fill: "blue", shape: "ring", text: "Busy" });
 
       try {
-        const response = await openai.chat(client, deploymentId, systemPrompt, historicalPrompts, inputPrompt, user, maxTokens);
+
+        const response = await openai.chat(client, deploymentId, systemPrompt, historicalPrompts, inputPrompt, user, {
+          maxTokens: maxTokens ?? null,
+          temperature: temperature ?? null,
+          topP: topP ?? null,
+          frequencyPenalty: frequencyPenalty ?? null,
+          presencePenalty: presencePenalty ?? null,
+          // stop: (stop && stop.trim() !== '') ? stop : null
+        });
+
         msg.payload.response = response;
         nthis.send(msg);
         nthis.status({ fill: "green", shape: "ring", text: "Ready" });

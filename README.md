@@ -16,10 +16,10 @@ currently only supports models with getChatCompletions
 
 ## TODO
 
-- pass in more options including temperature etc...
-- support more models perhaps?
-- perhaps add support to non-openai models in Azure AI?
+- see if there's anything to do with Azure AI Search Service
+- support more models
+- perhaps add support to non-openai models in Azure AI services
 
-## Support?
+## Support
 
 If you like this project a lot, you can buy some food for my dogs in [Patreon](https://www.patreon.com/supportpiggy)

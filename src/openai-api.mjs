@@ -22,7 +22,7 @@ export function initialize(endpoint, apikey) {
  * inputName: string?
  * returns: string
  */
-export async function chat(client, deploymentId, systemPrompt, messages, input, inputName, maxTokens) {
+export async function chat(client, deploymentId, systemPrompt, messages, input, inputName, options) {
   let response = "";
 
   let currMessage = { role: "user", content: input };
@@ -34,7 +34,7 @@ export async function chat(client, deploymentId, systemPrompt, messages, input, 
   const chatCompletions = await client.getChatCompletions(
     deploymentId,
     [{ role: "system", content: systemPrompt }, ...messages],
-    { maxTokens: maxTokens }
+    options
   );
 
   for (const choice of chatCompletions.choices) {
