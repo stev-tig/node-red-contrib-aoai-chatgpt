@@ -12,13 +12,13 @@ export function initialize(endpoint, apikey) {
 }
 
 /*
- * chat(client, deploymentId, systemPrompt, messages, input)
+ * chat(client, deploymentId, systemPrompt, messages, input, inputName, option)
  *
  * client: OpenAIClient
  * deploymentId: string
  * systemPrompt: string
  * messages: { role: string, content: string }[]
- * input: string | []  {type: "image_url", imageUrl: {url: string}} | {type: "text", text: string}
+ * input: string | [] {type: "image_url", imageUrl: {url: string}} | {type: "text", text: string}
  * inputName: string?
  * options: {}
  * returns: { response: string?, toolCalls: ChatCompletionsToolCallUnion[] }

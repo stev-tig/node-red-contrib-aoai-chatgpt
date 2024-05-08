@@ -39,25 +39,41 @@ module.exports = function (RED) {
       const topP = msg.payload.topP ?? parseFloat(config.topP);
       const frequencyPenalty = msg.payload.frequencyPenalty ?? parseInt(config.frequencyPenalty);
       const presencePenalty = msg.payload.presencePenalty ?? parseInt(config.presencePenalty);
-      const tools = msg.payload.tools ?? config.tools;
+      const tools = msg.payload.tools ? msg.payload.tools : null;
       const toolChoice = msg.payload.toolChoice ?? "auto";
-
       // const stop = msg.payload.stop ?? config.stop;
 
       node.status({ fill: "blue", shape: "ring", text: "Busy" });
+      
+      let option = {
+        maxTokens: maxTokens ?? null,
+        temperature: temperature ?? null,
+        topP: topP ?? null,
+        frequencyPenalty: frequencyPenalty ?? null,
+        presencePenalty: presencePenalty ?? null,
+        // stop: (stop && stop.trim() !== '') ? stop : null
+        tools: tools,
+        toolChoice: tools ? toolChoice : null
+      };
+
+      // gpt-4-vision doesn't support tools
+      if (Array.isArray(inputPrompt)) {
+        console.log("no-tools");
+        delete option.tools;
+        delete option.toolChoice;
+      }
+      // gpt-4-vision doesn't support tools
+      for (const prompt of historicalPrompts) {
+        if (Array.isArray(prompt.content)) {
+          console.log("no-tools");
+          delete option.tools;
+          delete option.toolChoice;
+          break;  
+        }
+      }
 
       try {
-
-        const response = await openai.chat(client, deploymentId, systemPrompt, historicalPrompts, inputPrompt, user, {
-          maxTokens: maxTokens ?? null,
-          temperature: temperature ?? null,
-          topP: topP ?? null,
-          frequencyPenalty: frequencyPenalty ?? null,
-          presencePenalty: presencePenalty ?? null,
-          // stop: (stop && stop.trim() !== '') ? stop : null
-          tools: tools,
-          toolChoice: tools ? toolChoice : null
-        });
+        const response = await openai.chat(client, deploymentId, systemPrompt, historicalPrompts, inputPrompt, user, option);
 
         if (response.response) {
           msg.payload.response = response.response;
@@ -71,7 +87,11 @@ module.exports = function (RED) {
 
       } catch (err) {
         console.error("encountered an error - chat: ", err);
-        console.error("encountered an error - chat (cont.): ", historicalPrompts.length > 2? historicalPrompts.slice(-2) : historicalPrompts);
+        console.error("encountered an error - chat (cont.): ", historicalPrompts.length > 2? historicalPrompts.slice(-2) : historicalPrompts)
+        
+        msg.payload.error = true;
+        msg.payload.response = JSON.stringify(err);
+        node.send([msg, null]);
         node.status({ fill: "red", shape: "ring", text: "Error" });
       }
     });

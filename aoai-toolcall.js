@@ -72,6 +72,11 @@ module.exports = function (RED) {
 
       } catch (err) {
         console.error("encountered an error - toolcall: ", err);
+        console.error("encountered an error - toolcall (cont.): ", historicalPrompts.length > 2? historicalPrompts.slice(-2) : historicalPrompts)
+
+        msg.payload.error = true;
+        msg.payload.response = JSON.stringify(err);
+        node.send([msg, null]);
         node.status({ fill: "red", shape: "ring", text: "Error" });
       }
     });
