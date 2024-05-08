@@ -1,0 +1,99 @@
+<!-- chat node -->
+<script type="text/javascript">
+  RED.nodes.registerType('aoai-toolcall', {
+    category: 'openai',
+    defaults: {
+      config: { value: "", type: "aoai-config" },
+      name: { value: "" },
+      maxTokens: { value: 128, required: true, validate: RED.validators.number() },
+      temperature: { value: 0.7, required: true, validate: RED.validators.number() },
+      topP: { value: 0.95, required: true, validate: RED.validators.number() },
+      presencePenalty: { value: 0, required: true, validate: RED.validators.number() },
+      frequencyPenalty: { value: 0, required: true, validate: RED.validators.number() },
+    },
+    inputs: 1,
+    outputs: 2,
+    color: "#3FADB5",
+    icon: "font-awesome/fa-search-plus",
+    outputLabels: ["response", "toolcall"],
+    label: function () {
+      return this.name || "aoai-toolcall";
+    }
+  });
+</script>
+
+<script type="text/html" data-template-name="aoai-toolcall">
+  <div class="form-row">
+    <label for="node-input-config" style="white-space: nowrap; width: 125px">
+      <i class="icon-tag"></i> Azure OpenAI account
+    </label>
+    <input type="text" id="node-input-config" placeholder="Select AOAI account">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-maxTokens"><i class="icon-tag"></i> maxTokens</label>
+    <input type="number" id="node-input-maxTokens">
+  </div>
+  <div class="form-row">
+    <label for="node-input-temperature"><i class="icon-tag"></i> temperature</label>
+    <input type="float" id="node-input-temperature">
+  </div>
+  <div class="form-row">
+    <label for="node-input-topP"><i class="icon-tag"></i> topP</label>
+    <input type="float" id="node-input-topP">
+  </div>
+  <div class="form-row">
+    <label for="node-input-presencePenalty"><i class="icon-tag"></i> presencePenalty</label>
+    <input type="number" id="node-input-presencePenalty">
+  </div>
+  <div class="form-row">
+    <label for="node-input-frequencyPenalty"><i class="icon-tag"></i> frequencyPenalty</label>
+    <input type="number" id="node-input-frequencyPenalty">
+  </div>
+</script>
+
+<script type="text/html" data-help-name="aoai-toolcall">
+  <p>Connect to Azure OpenAI ChatGPT service</p>
+
+  <h3>Inputs</h3>
+  <dl class="message-properties">
+    <dt>payload.systemPrompt <span class="property-type">string</span></dt>
+    <dd> system prompt, usually personality and background information of the bot.</dd>
+    <dt>payload.inputPrompt <span class="property-type">{ toolCall: ChatCompletionsToolCallUnion, toolResponse: string }[]</span></dt>
+    <dd> input prompt, original toolcall & response</dd>
+    <dt class="optional">payload.historicalPrompts <span class="property-type">{ role: string, content: string }[]</span></dt>
+    <dd> the historical conversion as context.</dd>
+    <dt class="optional">payload.maxTokens <span class="property-type">number</span></dt>
+    <dd> override the configured maxTokens</dd>
+    <dt class="optional">payload.temperature <span class="property-type">float</span></dt>
+    <dd> override the configured temperature, between 0 and 1</dd>
+    <dt class="optional">payload.topP <span class="property-type">float</span></dt>
+    <dd> override the configured topP, between 0 and 1</dd>
+    <dt class="optional">payload.presencePenalty <span class="property-type">number</span></dt>
+    <dd> override the configured presencePenalty</dd>
+    <dt class="optional">payload.frequencyPenalty <span class="property-type">number</span></dt>
+    <dd> override the configured frequencyPenalty</dd>
+  </dl>
+
+  <h3>Outputs</h3>
+  <dl class="message-properties">
+    <dt>payload.response <span class="property-type">string</span></dt>
+    <dd> gpt response</dd>
+  </dl>
+
+  <h3>Details</h3>
+  <p><code>msg.payload</code> is used as the payload of the published message.
+  The inputPrompt will be appended to the <code>payload.historicalPrompts</code> array.
+  but gpt response will NOT be appended to the <code>payload.historicalPrompts</code> array.
+  you have to add a manual function node to determine if you want to append the response.
+  </p>
+
+  <h3>References</h3>
+  <ul>
+    <li><a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/">Azure OpenAI Docs</a> - full description of the openai flows</li>
+  </ul>
+
+</script>

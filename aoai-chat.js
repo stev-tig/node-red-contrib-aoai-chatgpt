@@ -1,38 +1,26 @@
 module.exports = function (RED) {
-  function AOAIChatGPTConfigNode(n) {
-    RED.nodes.createNode(this, n);
-    this.name = n.name;
-    this.deploymentId = n.deploymentId;
-  }
-
-  RED.nodes.registerType("aoai-chatgpt-config", AOAIChatGPTConfigNode, {
-    credentials: {
-      apikey: { type: "text" },
-      endpoint: { type: "text" },
-    }
-  });
 
   function AOAIChatGPTNode(config) {
 
-    const nthis = this;
+    const node = this;
     RED.nodes.createNode(this, config);
     this.name = config.name;
 
     const aoaiconfig = RED.nodes.getNode(config.config);
 
     if (!aoaiconfig) {
-      nthis.status({ fill: "red", shape: "ring", text: "missing config" });
+      node.status({ fill: "red", shape: "ring", text: "missing config" });
       return;
     }
 
     const deploymentId = aoaiconfig.deploymentId;
-    nthis.status({ fill: "green", shape: "ring", text: "Ready" });
+    node.status({ fill: "green", shape: "ring", text: "Ready" });
 
     // Dynamic import while created the node synchronously, so, delay the library & openai client initialization
     let openai = null;
     let client = null;
 
-    nthis.on('input', async function (msg) {
+    node.on('input', async function (msg) {
 
       if (!openai) {
         openai = await import("./src/openai-api.mjs");
@@ -51,9 +39,12 @@ module.exports = function (RED) {
       const topP = msg.payload.topP ?? parseFloat(config.topP);
       const frequencyPenalty = msg.payload.frequencyPenalty ?? parseInt(config.frequencyPenalty);
       const presencePenalty = msg.payload.presencePenalty ?? parseInt(config.presencePenalty);
+      const tools = msg.payload.tools ?? config.tools;
+      const toolChoice = msg.payload.toolChoice ?? "auto";
+
       // const stop = msg.payload.stop ?? config.stop;
 
-      nthis.status({ fill: "blue", shape: "ring", text: "Busy" });
+      node.status({ fill: "blue", shape: "ring", text: "Busy" });
 
       try {
 
@@ -64,23 +55,32 @@ module.exports = function (RED) {
           frequencyPenalty: frequencyPenalty ?? null,
           presencePenalty: presencePenalty ?? null,
           // stop: (stop && stop.trim() !== '') ? stop : null
+          tools: tools,
+          toolChoice: tools ? toolChoice : null
         });
 
-        msg.payload.response = response;
-        nthis.send(msg);
-        nthis.status({ fill: "green", shape: "ring", text: "Ready" });
+        if (response.response) {
+          msg.payload.response = response.response;
+          node.send([msg, null]);
+        } else {
+          msg.payload.toolCallMsg = response.rawMessage;
+          msg.payload.toolCalls = response.toolCalls;
+          node.send([null, msg]);
+        }
+        node.status({ fill: "green", shape: "ring", text: "Ready" });
 
       } catch (err) {
-        console.error("encountered an error:", err);
-        nthis.status({ fill: "red", shape: "ring", text: "Error" });
+        console.error("encountered an error - chat: ", err);
+        console.error("encountered an error - chat (cont.): ", historicalPrompts.length > 2? historicalPrompts.slice(-2) : historicalPrompts);
+        node.status({ fill: "red", shape: "ring", text: "Error" });
       }
     });
 
 
-    nthis.on('close', function () {
+    node.on('close', function () {
     });
 
   }
 
-  RED.nodes.registerType("aoai-chatgpt", AOAIChatGPTNode);
+  RED.nodes.registerType("aoai-chat", AOAIChatGPTNode);
 }

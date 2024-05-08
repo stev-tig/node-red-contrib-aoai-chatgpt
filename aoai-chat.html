@@ -1,65 +1,9 @@
-<!-- config node -->
+<!-- chat node -->
 <script type="text/javascript">
-  RED.nodes.registerType('aoai-chatgpt-config', {
-    category: 'config',
-    defaults: {
-      name: { value: "Your Model Name", required: true },
-      deploymentId: { value: "Model Deployment ID", required: true },
-    },
-    credentials: {
-      endpoint: { value: "", required: true },
-      apikey: { value: "", required: true },
-    },
-    label: function () {
-      return this.name;
-    }
-  });
-</script>
-
-<script type="text/html" data-template-name="aoai-chatgpt-config">
-  <div class="form-row">
-    <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-config-input-name">
-  </div>
-  <div class="form-row">
-    <label for="node-config-input-deploymentId"><i class="fa fa-tag"></i> DEPLOYMENT-ID</label>
-    <input type="text" id="node-config-input-deploymentId">
-  </div>
-  <div class="form-row">
-    <label for="node-config-input-endpoint"><i class="fa fa-tag"></i> ENDPOINT</label>
-    <input type="text" id="node-config-input-endpoint">
-  </div>
-  <div class="form-row">
-    <label for="node-config-input-apikey"><i class="fa fa-tag"></i> API-KEY</label>
-    <input type="text" id="node-config-input-apikey">
-  </div>
-</script>
-
-<script type="text/html" data-help-name="aoai-chatgpt-config">
-  <p>Configuring credentials</p>
-
-  <h3>Config</h3>
-  <dl class="message-properties">
-    <dt>DEPLOYMENT-ID <span class="property-type">string</span></dt>
-    <dd> Model Deployment ID, if you don't have one, go to Azure OpenAI Studio > Deployments > Create New Deployment</dd>
-    <dt>ENDPOINT <span class="property-type">string</span></dt>
-    <dd> Endpoint of the AI, it is usually <code>https://your-ai-instance.openai.azure.com/</code></dd>
-    <dt>API-KEY <span class="property-type">string</span></dt>
-    <dd> API Key of your AI model</dd>  
-  </dl>
-
-  <h3>References</h3>
-  <ul>
-    <li><a href="https://learn.microsoft.com/en-us/azure/ai-services/openai/">Azure OpenAI Docs</a> - full description of the openai flows</li>
-  </ul>
-</script>
-
-<!-- node -->
-<script type="text/javascript">
-  RED.nodes.registerType('aoai-chatgpt', {
+  RED.nodes.registerType('aoai-chat', {
     category: 'openai',
     defaults: {
-      config: { value: "", type: "aoai-chatgpt-config" },
+      config: { value: "", type: "aoai-config" },
       name: { value: "" },
       maxTokens: { value: 128, required: true, validate: RED.validators.number() },
       temperature: { value: 0.7, required: true, validate: RED.validators.number() },
@@ -68,16 +12,17 @@
       frequencyPenalty: { value: 0, required: true, validate: RED.validators.number() },
     },
     inputs: 1,
-    outputs: 1,
+    outputs: 2,
     color: "#3FADB5",
     icon: "font-awesome/fa-spinner",
+    outputLabels: ["response", "toolcall"],
     label: function () {
-      return this.name || "aoai-chatgpt";
+      return this.name || "aoai-chat";
     }
   });
 </script>
 
-<script type="text/html" data-template-name="aoai-chatgpt">
+<script type="text/html" data-template-name="aoai-chat">
   <div class="form-row">
     <label for="node-input-config" style="white-space: nowrap; width: 125px">
       <i class="icon-tag"></i> Azure OpenAI account
@@ -110,7 +55,7 @@
   </div>
 </script>
 
-<script type="text/html" data-help-name="aoai-chatgpt">
+<script type="text/html" data-help-name="aoai-chat">
   <p>Connect to Azure OpenAI ChatGPT service</p>
 
   <h3>Inputs</h3>

@@ -4,7 +4,9 @@
   "description": "node uses Azure OpenAI",
   "node-red": {
     "nodes": {
-      "aoai-chatgpt": "aoai-chatgpt.js"
+      "aoai-config": "aoai-config.js",
+      "aoai-chat": "aoai-chat.js",
+      "aoai-toolcall": "aoai-toolcall.js"
     }
   },
   "scripts": {
