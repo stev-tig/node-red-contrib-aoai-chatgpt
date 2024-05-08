@@ -18,7 +18,7 @@ export function initialize(endpoint, apikey) {
  * deploymentId: string
  * systemPrompt: string
  * messages: { role: string, content: string }[]
- * input: string
+ * input: string | []  {type: "image_url", image_url: {url: string}} | {type: "text", text: string}
  * inputName: string?
  * returns: string
  */

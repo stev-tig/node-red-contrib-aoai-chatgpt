@@ -14,11 +14,20 @@ currently only supports models with getChatCompletions
 - gpt-35-turbo
 - gpt-4
 
+## GPT4 vision
+
+as gpt4 vision models also supports to input with vision
+
+the type input is no longer "text", but []ChatMessage, where ChatMessage would be the following
+
+- `{type: "text", text: string}`
+- `{type: "image_url", imageUrl: {url: "data:image/jpeg;base64,{base64-encoded-image}"}}`
+- ...
+
 ## TODO
 
 - see if there's anything to do with Azure AI Search Service
 - support more models
-- perhaps add support to non-openai models in Azure AI services
 
 ## Support
 
