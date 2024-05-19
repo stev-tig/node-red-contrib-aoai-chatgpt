@@ -6,7 +6,8 @@
     "nodes": {
       "aoai-config": "aoai-config.js",
       "aoai-chat": "aoai-chat.js",
-      "aoai-toolcall": "aoai-toolcall.js"
+      "aoai-toolcall": "aoai-toolcall.js",
+      "aoai-tokencalc": "aoai-tokencalc.js"
     }
   },
   "scripts": {
@@ -28,7 +29,8 @@
   "author": "Steven Poon",
   "license": "MIT",
   "dependencies": {
-    "@azure/openai": "^1.0.0-beta.12"
+    "@azure/openai": "^1.0.0-beta.12",
+    "tiktoken": "^1.0.14"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",

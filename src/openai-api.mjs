@@ -1,4 +1,5 @@
 import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
+import { get_encoding } from "tiktoken";
 
 /*
  * initialize(endpoint, apikey)
@@ -9,6 +10,39 @@ import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
  */
 export function initialize(endpoint, apikey) {
   return new OpenAIClient(endpoint, new AzureKeyCredential(apikey));
+}
+
+/* 
+ * calculateToken(input)
+ * Calculate token needed with cl100k_base
+ *
+ * input: string
+ * returns: number
+ */
+export function countToken(input) {
+  const encoding = get_encoding("cl100k_base");
+  const tokens = encoding.encode(input);
+  encoding.free();
+  return tokens.length;
+}
+
+/*
+ * embedding(client, deploymentId, input, dimensions)
+ *
+ * client: OpenAIClient
+ * deploymentId: string
+ * input: string
+ * dimensions: number?
+ * returns: number[]
+ */
+export async function embedding(client, deploymentId, input, dimensions) {
+  const option = { dimensions: dimensions }
+  if (!dimensions) {
+    delete option.dimensions;
+  }
+
+  const vec = await client.getEmbeddings(deploymentId, [input], option);
+  return vec?.data[0]?.embedding;
 }
 
 /*
@@ -23,17 +57,23 @@ export function initialize(endpoint, apikey) {
  * options: {}
  * returns: { response: string?, toolCalls: ChatCompletionsToolCallUnion[] }
  */
-export async function chat(client, deploymentId, systemPrompt, messages, input, inputName, options) {
+export async function chat(client, deploymentId, systemPrompt, messages, currMessage, options) {
 
-  let currMessage = { role: "user", content: input };
-  if (inputName) {
-    currMessage.name = inputName;
+  // let currMessage = { role: "user", content: input };
+  // if (inputName) {
+  //   currMessage.name = inputName;
+  // }
+  // not automatically push into message anymore
+  // messages.push(currMessage);
+
+  let input = [{ role: "system", content: systemPrompt }, ...messages];
+  if (currMessage) {
+    input.push(currMessage);
   }
-  messages.push(currMessage);
 
   const chatCompletions = await client.getChatCompletions(
     deploymentId,
-    [{ role: "system", content: systemPrompt }, ...messages],
+    input,
     options
   );
 
@@ -44,7 +84,7 @@ export async function chat(client, deploymentId, systemPrompt, messages, input, 
 }
 
 /*
- * addToolCallRespsChat(client, deploymentId, systemPrompt, messages, toolcallResps, options)
+ * addToolCallRespsChat(client, deploymentId, systemPrompt, messages, inputMessage(orig), toolcallResps, options)
  *
  * client: OpenAIClient
  * deploymentId: string
@@ -55,11 +95,13 @@ export async function chat(client, deploymentId, systemPrompt, messages, input, 
  * returns: { response: string?, toolCalls: ChatCompletionsToolCallUnion[] }
  */
 export async function addToolCallRespsChat(client, deploymentId, 
-  systemPrompt, messages, 
+  systemPrompt, messages, inputMessage,
   toolcallOrigMessage,
   toolcallResps, options) {
 
-    messages.push(toolcallOrigMessage);
+    let input = [{ role: "system", content: systemPrompt }, ...messages, inputMessage];
+    
+    input.push(toolcallOrigMessage);
 
     for (const toolcallResp of toolcallResps) {
 
@@ -71,12 +113,12 @@ export async function addToolCallRespsChat(client, deploymentId,
         content: toolResponse,
       };
 
-      messages.push(toolMsg);
+      input.push(toolMsg);
     }
 
     const chatCompletions = await client.getChatCompletions(
       deploymentId,
-      [{ role: "system", content: systemPrompt }, ...messages],
+      input,
       options
     );
 

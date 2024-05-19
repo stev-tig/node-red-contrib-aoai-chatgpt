@@ -47,7 +47,7 @@ module.exports = function (RED) {
       node.status({ fill: "blue", shape: "ring", text: "Busy" });
 
       try {
-        const response = await openai.addToolCallRespsChat(client, deploymentId, systemPrompt, historicalPrompts, 
+        const response = await openai.addToolCallRespsChat(client, deploymentId, systemPrompt, historicalPrompts, msg.payload.inputMessage,
           toolcallOrigMessage, toolcallResps, 
         {
           maxTokens: maxTokens ?? null,

@@ -32,8 +32,6 @@ module.exports = function (RED) {
 
       const systemPrompt = msg.payload.systemPrompt;
       const historicalPrompts = msg.payload.historicalPrompts ?? [];
-      const inputPrompt = msg.payload.inputPrompt;
-      const user = msg.payload.user ?? null;
       const maxTokens = msg.payload.maxTokens ?? parseInt(config.maxTokens);
       const temperature = msg.payload.temperature ?? parseFloat(config.temperature);
       const topP = msg.payload.topP ?? parseFloat(config.topP);
@@ -57,14 +55,14 @@ module.exports = function (RED) {
       };
 
       // gpt-4-vision doesn't support tools
-      if (Array.isArray(inputPrompt)) {
+      if (msg.payload.inputMessage && msg.payload.inputMessage.content.length > 1) {
         console.log("no-tools");
         delete option.tools;
         delete option.toolChoice;
       }
       // gpt-4-vision doesn't support tools
       for (const prompt of historicalPrompts) {
-        if (Array.isArray(prompt.content)) {
+        if (Array.isArray(prompt.content) && prompt.content.length > 1) {
           console.log("no-tools");
           delete option.tools;
           delete option.toolChoice;
@@ -73,7 +71,8 @@ module.exports = function (RED) {
       }
 
       try {
-        const response = await openai.chat(client, deploymentId, systemPrompt, historicalPrompts, inputPrompt, user, option);
+
+        const response = await openai.chat(client, deploymentId, systemPrompt, historicalPrompts, msg.payload.inputMessage, option);
 
         if (response.response) {
           msg.payload.response = response.response;
